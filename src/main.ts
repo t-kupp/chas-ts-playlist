@@ -12,7 +12,7 @@ type Genre = "pop" | "rock" | "other";
 interface Track {
   id: number;
   title: string;
-  duration: number;
+  duration: number | null;
   genre: Genre;
   isFavorite: boolean;
 }
@@ -21,10 +21,24 @@ let tracks: Track[] = [
   { id: 0, title: "Test track", duration: 125, genre: "other", isFavorite: false },
 ];
 
-function parseDuration(time: string): number {
-  // if (!time) return null;
+function parseDuration(time: string): number | null {
+  if (!time) return null;
 
-  const [minutes, seconds] = time.split(":");
+  // Validate mm:ss input
+  const parts = time.split(":");
+  if (parts.length !== 2) return null;
+  const [minutes, seconds] = parts;
+  if (
+    minutes.length < 1 ||
+    minutes.length > 2 ||
+    seconds.length !== 2 ||
+    isNaN(Number(minutes)) ||
+    isNaN(Number(seconds)) ||
+    Number(seconds) > 59
+  ) {
+    return null;
+  }
+
   return parseInt(minutes) * 60 + parseInt(seconds);
 }
 
@@ -70,7 +84,11 @@ function render() {
   tracks.map((track) => {
     // Li element
     const li = document.createElement("li");
-    li.innerText = track.title + " - " + formatDuration(track.duration) + ` (${track.genre})`;
+    li.innerText =
+      track.title +
+      " - " +
+      (track.duration !== null ? formatDuration(track.duration) : "??:??") +
+      ` (${track.genre})`;
     list.appendChild(li);
 
     // Favorite input and label
@@ -102,6 +120,11 @@ function render() {
     });
 
     li.appendChild(button);
+
+    // Total time
+    const totalTime = tracks.reduce((sum, track) => sum + (track.duration ?? 0), 0);
+
+    totalEl.innerText = formatDuration(totalTime);
   });
 }
 
