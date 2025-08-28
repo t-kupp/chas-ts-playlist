@@ -95,7 +95,7 @@ function render() {
     const input = document.createElement("input");
     const label = document.createElement("label");
 
-    input.id = "fav";
+    input.id = `fav-${track.id}`;
     input.type = "checkbox";
     input.checked = track.isFavorite;
     input.addEventListener("click", () => {
@@ -105,7 +105,7 @@ function render() {
     });
 
     label.innerText = " Fav:";
-    label.htmlFor = "fav";
+    label.htmlFor = `fav-${track.id}`;
 
     li.appendChild(label);
     li.appendChild(input);
